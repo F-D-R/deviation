@@ -122,7 +122,7 @@ static void get_input_str(int src, const char **ptr, int *idx)
 {
     *ptr = "";
     *idx = -1;
-    #define CHANDEF(x) case INP_##x : INPNAME_##x(*ptr, *idx); break;
+    #define CHANDEF(x, sc) case INP_##x : INPNAME_##x(*ptr, *idx); break;
     switch(src) {
         #include "capabilities.h"
     };

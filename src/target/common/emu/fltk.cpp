@@ -52,6 +52,13 @@ extern "C" {
 
 static const u16 keymap[BUT_LAST] = BUTTON_MAP;
 
+/* List of shortcuts for the emulator */
+#define CHANDEF(x, sc) sc,
+static const char * emu_shortcuts[] = {
+    #include "capabilities.h"
+};
+#undef CHANDEF
+
 static struct {
     s32 xscale;
     s32 yscale;
@@ -366,19 +373,26 @@ void LCD_Init()
 
   int height = (lcdScreenHeight > INP_LAST + (INP_LAST - 1) * 10 + 85) ?
                 lcdScreenHeight : INP_LAST + (INP_LAST - 1) * 10 + 85;
-  main_window = new mywin(lcdScreenWidth + 320,height);
+  main_window = new mywin(lcdScreenWidth + 340,height);
   image_ypos = (height - lcdScreenHeight) / 2;
   image = new image_box(0, image_ypos, lcdScreenWidth, lcdScreenHeight);
   //fl_font(fl_font(), 5);
   memset(&gui, 0, sizeof(gui));
   for(i = 0; i < INP_LAST-1; i++) {
       char *label;
-      label = (char *)malloc(10);
-      INPUT_SourceName(label, i + 1);
-      if(i < (INP_LAST-1) / 2) {
-          gui.raw[i] = new Fl_Output(lcdScreenWidth + 90, 20 * i + 5, 60, 15, i < 4 ? tx_stick_names[i] : label);
+      label = (char *)malloc(16);
+      if(i < 4) {
+          strcpy(label, tx_stick_names[i]);
       } else {
-          gui.raw[i] = new Fl_Output(lcdScreenWidth + 230, 20 * (i - (INP_LAST - 1)/ 2) + 5, 60, 15, label);
+          INPUT_SourceName(label, i + 1);
+      }
+      strcat(label, " [");
+      strcat(label, emu_shortcuts[i]);
+      strcat(label, "]");
+      if(i < (INP_LAST-1) / 2) {
+          gui.raw[i] = new Fl_Output(lcdScreenWidth + 110, 20 * i + 5, 60, 15, label);
+      } else {
+          gui.raw[i] = new Fl_Output(lcdScreenWidth + 270, 20 * (i - (INP_LAST - 1)/ 2) + 5, 60, 15, label);
       }
       gui.raw[i]->textsize(10);
   }
@@ -387,15 +401,15 @@ void LCD_Init()
       char *str;
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 1);
-      gui.final[i] = new Fl_Output(lcdScreenWidth + 50, height - (4 - i) * 20 - 5, 50, 15, str);
+      gui.final[i] = new Fl_Output(lcdScreenWidth + 60, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i]->textsize(10);
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 5);
-      gui.final[i+4] = new Fl_Output(lcdScreenWidth + 150, height - (4 - i) * 20 - 5, 50, 15, str);
+      gui.final[i+4] = new Fl_Output(lcdScreenWidth + 170, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i+4]->textsize(10);
       str = (char *)malloc(5);
       sprintf(str, "Ch%d", i + 9);
-      gui.final[i+8] = new Fl_Output(lcdScreenWidth + 260, height - (4 - i) * 20 - 5, 50, 15, str);
+      gui.final[i+8] = new Fl_Output(lcdScreenWidth + 280, height - (4 - i) * 20 - 5, 50, 15, str);
       gui.final[i+8]->textsize(10);
   }
   //Fl_Box box(320, 0, 320, 240);

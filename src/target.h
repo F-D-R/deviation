@@ -12,7 +12,7 @@
 #include "target_defs.h"
 
 /* List of channels provided by the Tx */
-#define CHANDEF(x) INP_##x,
+#define CHANDEF(x, sc) INP_##x,
 #define UNDEF_INP
 enum {
     INP_NONE,
